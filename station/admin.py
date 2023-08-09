@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (
+from station.models import (
     Station,
     Route,
     TrainType,

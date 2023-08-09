@@ -65,6 +65,9 @@ class Journey(models.Model):
     def __str__(self):
         return f"{self.route} by {self.train}"
 
+    class Meta:
+        ordering = ["-departure_time"]
+
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -74,6 +77,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f"N.{self.id}"
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class Ticket(models.Model):
