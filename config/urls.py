@@ -15,7 +15,5 @@ urlpatterns = [
     ),
 ]
 
-# todo: user and auth
-# todo: add JWT
 # todo: add tests
 # todo: dockerized
