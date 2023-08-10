@@ -43,6 +43,10 @@ class Train(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def capacity(self) -> int:
+        return self.cargo_num * self.places_in_cargo
+
 
 class Crew(models.Model):
     first_name = models.CharField(max_length=255)
