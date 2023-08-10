@@ -2,6 +2,7 @@ from datetime import datetime
 from rest_framework import viewsets
 from django.db.models import F, Value, Count
 from django.db.models.functions import Concat
+from rest_framework.pagination import PageNumberPagination
 
 from station.models import (
     Station,
@@ -125,6 +126,11 @@ class JourneyViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class OrderPagination(PageNumberPagination):
+    page_size = 5
+    max_page_size = 100
+
+
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related(
         "tickets__journey__route",
@@ -132,6 +138,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         "tickets__journey__crews",
     )
     serializer_class = OrderSerializer
+    pagination_class = OrderPagination
 
     def get_queryset(self):
         queryset = self.queryset
