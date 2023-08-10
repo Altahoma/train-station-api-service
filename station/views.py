@@ -1,4 +1,7 @@
+from datetime import datetime
 from rest_framework import viewsets
+from django.db.models import F, Value, Count
+from django.db.models.functions import Concat
 
 from station.models import (
     Station,
@@ -8,7 +11,6 @@ from station.models import (
     Crew,
     Journey,
     Order,
-    Ticket,
 )
 from station.serializers import (
     StationSerializer,
@@ -21,8 +23,8 @@ from station.serializers import (
     CrewSerializer,
     JourneySerializer,
     JourneyListSerializer,
+    JourneyDetailSerializer,
     OrderSerializer,
-    TicketSerializer,
     OrderListSerializer,
 )
 
@@ -65,13 +67,62 @@ class CrewViewSet(viewsets.ModelViewSet):
 
 
 class JourneyViewSet(viewsets.ModelViewSet):
-    queryset = Journey.objects.select_related("route", "train").prefetch_related("crews")
+    queryset = Journey.objects.all()
     serializer_class = JourneySerializer
+
+    @staticmethod
+    def _params_to_ints(qs):
+        return [int(str_id) for str_id in qs.split(",")]
 
     def get_serializer_class(self):
         if self.action == "list":
             return JourneyListSerializer
+
+        if self.action == "retrieve":
+            return JourneyDetailSerializer
+
         return JourneySerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        route = self.request.query_params.get("route")
+        train = self.request.query_params.get("train")
+        departure_time = self.request.query_params.get("departure_time")
+        arrival_time = self.request.query_params.get("arrival_time")
+
+        if route:
+            queryset = queryset.filter(route_id=int(route))
+
+        if train:
+            queryset = queryset.filter(train_id=int(train))
+
+        if departure_time:
+            date = datetime.strptime(departure_time, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=date)
+
+        if arrival_time:
+            date = datetime.strptime(arrival_time, "%Y-%m-%d").date()
+            queryset = queryset.filter(arrival_time__date=date)
+
+        if self.action in ("list", "retrieve"):
+            queryset = (
+                queryset.prefetch_related("crews")
+                .select_related("route__source", "route__destination", "train")
+                .annotate(
+                    tickets_available=(
+                        F("train__cargo_num") * F("train__places_in_cargo")
+                        - Count("tickets")
+                    ),
+                    trip=Concat(
+                        F("route__source__name"),
+                        Value(" to "),
+                        F("route__destination__name"),
+                    ),
+                )
+            )
+
+        return queryset
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -95,8 +146,3 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-
-class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.select_related("journey", "order")
-    serializer_class = TicketSerializer

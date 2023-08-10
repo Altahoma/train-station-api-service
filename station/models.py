@@ -22,7 +22,7 @@ class Route(models.Model):
     distance = models.IntegerField()
 
     def __str__(self):
-        return f"{self.source} to {self.destination}"
+        return str(self.source) + " to " + str(self.destination)  # todo fix n+1
 
 
 class TrainType(models.Model):
@@ -53,7 +53,7 @@ class Crew(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.first_name + " " + self.last_name
 
 
 class Journey(models.Model):
@@ -68,7 +68,7 @@ class Journey(models.Model):
     arrival_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.route} by {self.train}"
+        return str(self.route.__str__()) + " " + str(self.train.__str__())  # todo fix n+1
 
     class Meta:
         ordering = ["-departure_time"]
@@ -81,7 +81,7 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f"N.{self.id}"
+        return "N." + str(self.id)
 
     class Meta:
         ordering = ["-created_at"]
@@ -97,8 +97,8 @@ class Ticket(models.Model):
         to=Order, on_delete=models.CASCADE, related_name="tickets"
     )
 
-    def __str__(self):
-        return f"Seat: {self.seat} to {self.journey}"
+    # def __str__(self):
+    #     return "Seat" + str(self.seat) + "to" + str(self.journey)
 
     @staticmethod
     def validate_ticket(cargo, seat, train, error_to_raise):
