@@ -14,6 +14,3 @@ urlpatterns = [
         name="swagger-ui",
     ),
 ]
-
-# todo: add tests
-# todo: dockerized
