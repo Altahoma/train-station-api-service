@@ -23,7 +23,7 @@ class Route(models.Model):
     distance = models.IntegerField()
 
     def __str__(self):
-        return str(self.source) + " to " + str(self.destination)  # todo fix n+1
+        return str(self.source) + " to " + str(self.destination)
 
 
 class TrainType(models.Model):
@@ -69,7 +69,7 @@ class Journey(models.Model):
     arrival_time = models.DateTimeField()
 
     def __str__(self):
-        return str(self.route.__str__()) + " " + str(self.train.__str__())  # todo fix n+1
+        return str(self.route.__str__()) + " " + str(self.train.__str__())
 
     class Meta:
         ordering = ["-departure_time"]
