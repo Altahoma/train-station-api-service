@@ -3,3 +3,4 @@ djangorestframework==3.14
 django-debug-toolbar==3.2.4
 drf-spectacular==0.26.4
 djangorestframework-simplejwt==5.2.2
+django-dump-load-utf8==0.0.4
