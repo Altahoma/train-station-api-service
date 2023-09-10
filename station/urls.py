@@ -20,8 +20,6 @@ router.register("orders", OrderViewSet)
 router.register("routes", RouteViewSet)
 router.register("journeys", JourneyViewSet)
 
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = router.urls
 
 app_name = "station"
